@@ -25,11 +25,76 @@
     //添加记录
     
     NSManagedObject *person = [NSEntityDescription insertNewObjectForEntityForName:@"Person" inManagedObjectContext:self.objectContext];
+    [person setValue:@"xyz" forKey:@"name"];
+    [person setValue:@12 forKey:@"age"];
     
+    //设置属性
+    NSManagedObject *card = [NSEntityDescription insertNewObjectForEntityForName:@"Card" inManagedObjectContext:self.objectContext];
+    
+    [card setValue:@"1234567890" forKey:@"no"];
+    
+    //设置关系
+    
+    [person setValue:card forKey:@"card"];
+    [card setValue:person forKey:@"person"];
+    
+    NSError *error;
+    
+    //将缓冲区的修改，同步到数据库
+    BOOL success = [self.objectContext save:&error];
+    if (!success) {
+        NSLog(@"%@",error);
+    }
     
     
     
 }
+
+//查询内容
+- (IBAction)select:(id)sender {
+    
+    NSArray *objects = [self selectPerson];
+    
+    
+}
+
+-(IBAction)change{
+    NSArray *objects = [self selectPerson];
+    NSManagedObject *person = objects.firstObject;
+    [person setValue:@"qingyun" forKey:@"name"];
+    
+    //修改了缓冲池中的对象，更新缓冲池到数据库
+    [self.objectContext save:nil];
+}
+
+-(IBAction)delete{
+    NSArray *objects = [self selectPerson];
+    [self.objectContext deleteObject:objects.firstObject];
+    [self.objectContext save:nil];
+}
+
+
+
+-(NSArray *)selectPerson{
+    //初始化一个查询对象
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    //查询目标
+    request.entity = [NSEntityDescription entityForName:@"Person" inManagedObjectContext:self.objectContext];
+    //设置排序条件
+    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:NO];
+    request.sortDescriptors = @[sort];
+    
+    //设置谓词
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name like %@", @"x*"];
+    request.predicate = predicate;
+    
+    //执行请求
+    NSError *error;
+    NSArray *objects = [self.objectContext executeFetchRequest:request error:&error];
+    
+    return objects;
+}
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];

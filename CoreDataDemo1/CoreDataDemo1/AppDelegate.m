@@ -17,6 +17,18 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    int count = 0;
+    for (int i = 0; i < 10000; i ++) {
+        count += i;
+    }
+    
+    NSString *string = @"hello";
+    
+    NSNumber *num = (NSNumber *)string;
+    
+    NSLog(@"%@", num.stringValue);
+    
+    
     return YES;
 }
 
